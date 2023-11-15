@@ -4,6 +4,7 @@ import { ContactForm } from 'components/ContactForm/ContacForm';
 import { nanoid } from 'nanoid';
 import { ContactList } from 'components/ContactsList/ContactsList';
 import { Filter } from 'components/Filter/Filter';
+const LS_KEY = 'contacts';
 
 export class App extends Component {
   state = {
@@ -15,6 +16,17 @@ export class App extends Component {
     ],
     filter: '',
   };
+  componentDidMount() {
+    const ls_contacts = JSON.parse(localStorage.getItem(LS_KEY));
+    if (ls_contacts) {
+      this.setState({ contacts: ls_contacts });
+    }
+  }
+  componentDidUpdate(prevProps, prevState) {
+    const { contacts } = this.state;
+    if (prevState.contacts !== contacts)
+      localStorage.setItem(LS_KEY, JSON.stringify(contacts));
+  }
   onSubmit = (name, number) => {
     if (this.state.contacts.find(c => c.name === name)) {
       alert(`${name} is already in contacts`);
@@ -25,7 +37,6 @@ export class App extends Component {
     }));
   };
   onDelete = id => {
-    console.log(id);
     this.setState(pState => ({
       contacts: pState.contacts.filter(x => x.id !== id),
     }));
